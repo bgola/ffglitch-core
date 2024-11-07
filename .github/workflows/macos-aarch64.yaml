@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - ffedit-0.10.2-gha
+      - WIP-ffedit-0.10.2-mb_type_script
 
 jobs:
   build:
