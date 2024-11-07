@@ -1024,54 +1024,6 @@ av_cold int ff_mpv_encode_init(AVCodecContext *avctx)
     cpb_props->avg_bitrate = avctx->bit_rate;
     cpb_props->buffer_size = avctx->rc_buffer_size;
 
-    /* ffgac extra */
-    if ( s->mb_type_script_fname != NULL )
-    {
-        FFScriptContext *script;
-        FFScriptObject *setup_func;
-        script = ff_script_init(s->mb_type_script_fname, 0);
-        if ( script == NULL )
-            return AVERROR(EINVAL);
-        s->mb_type_script = script;
-        s->mb_type_func = ff_script_get_func(script, "mb_type_func", 1);
-        if ( s->mb_type_func == NULL )
-            return AVERROR(EINVAL);
-        setup_func = ff_script_get_func(script, "setup", 0);
-        if ( setup_func != NULL )
-        {
-            ret = ff_script_call_func(script, NULL, setup_func, NULL);
-            ff_script_free_obj(script, setup_func);
-            if ( ret < 0 )
-            {
-                av_log(script, AV_LOG_FATAL, "Error calling setup() function in %s\n", s->mb_type_script_fname);
-                return AVERROR(EINVAL);
-            }
-        }
-    }
-    if ( s->pict_type_script_fname != NULL )
-    {
-        FFScriptContext *script;
-        FFScriptObject *setup_func;
-        script = ff_script_init(s->pict_type_script_fname, 0);
-        if ( script == NULL )
-            return AVERROR(EINVAL);
-        s->pict_type_script = script;
-        s->pict_type_func = ff_script_get_func(script, "pict_type_func", 1);
-        if ( s->pict_type_func == NULL )
-            return AVERROR(EINVAL);
-        setup_func = ff_script_get_func(script, "setup", 0);
-        if ( setup_func != NULL )
-        {
-            ret = ff_script_call_func(script, NULL, setup_func, NULL);
-            ff_script_free_obj(script, setup_func);
-            if ( ret < 0 )
-            {
-                av_log(script, AV_LOG_FATAL, "Error calling setup() function in %s\n", s->pict_type_script_fname);
-                return AVERROR(EINVAL);
-            }
-        }
-    }
-
     return 0;
 }
 
@@ -1702,6 +1654,30 @@ static int select_input_picture(MpegEncContext *s)
             }
 
             /* ffgac extra */
+            if ( s->pict_type_script_fname != NULL )
+            {
+                FFScriptContext *script;
+                FFScriptObject *setup_func;
+                script = ff_script_init(s->pict_type_script_fname, 0);
+                if ( script == NULL )
+                    return AVERROR(EINVAL);
+                s->pict_type_script = script;
+                s->pict_type_func = ff_script_get_func(script, "pict_type_func", 1);
+                if ( s->pict_type_func == NULL )
+                    return AVERROR(EINVAL);
+                setup_func = ff_script_get_func(script, "setup", 0);
+                if ( setup_func != NULL )
+                {
+                    ret = ff_script_call_func(script, NULL, setup_func, NULL);
+                    ff_script_free_obj(script, setup_func);
+                    if ( ret < 0 )
+                    {
+                        av_log(script, AV_LOG_FATAL, "Error calling setup() function in %s\n", s->pict_type_script_fname);
+                        return AVERROR(EINVAL);
+                    }
+                }
+                s->pict_type_script_fname = NULL;
+            }
             if ( s->pict_type_func != NULL )
             {
                 FFScriptContext *script = s->pict_type_script;
@@ -3827,6 +3803,30 @@ static int encode_picture(MpegEncContext *s)
     /* Estimate motion for every MB */
     if(s->pict_type != AV_PICTURE_TYPE_I){
         /* ffgac extra */
+        if ( s->mb_type_script_fname != NULL )
+        {
+            FFScriptContext *script;
+            FFScriptObject *setup_func;
+            script = ff_script_init(s->mb_type_script_fname, 0);
+            if ( script == NULL )
+                return AVERROR(EINVAL);
+            s->mb_type_script = script;
+            s->mb_type_func = ff_script_get_func(script, "mb_type_func", 1);
+            if ( s->mb_type_func == NULL )
+                return AVERROR(EINVAL);
+            setup_func = ff_script_get_func(script, "setup", 0);
+            if ( setup_func != NULL )
+            {
+                ret = ff_script_call_func(script, NULL, setup_func, NULL);
+                ff_script_free_obj(script, setup_func);
+                if ( ret < 0 )
+                {
+                    av_log(script, AV_LOG_FATAL, "Error calling setup() function in %s\n", s->mb_type_script_fname);
+                    return AVERROR(EINVAL);
+                }
+            }
+            s->mb_type_script_fname = NULL;
+        }
         if ( s->mb_type_func != NULL )
         {
             FFScriptContext *script = s->mb_type_script;
