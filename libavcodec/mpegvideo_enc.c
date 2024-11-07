@@ -3857,6 +3857,7 @@ static int encode_picture(MpegEncContext *s)
             if ( ret < 0 )
             {
                 av_log(script, AV_LOG_FATAL, "Error calling mb_type_func() function in %s\n", s->mb_type_script_fname);
+                ff_script_free_obj(script, func_args);
                 json_ctx_free(&jctx);
                 return -1;
             }
