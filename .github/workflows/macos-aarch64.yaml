@@ -23,7 +23,7 @@ jobs:
 
       - name: Build static zlib-ng
         env:
-          MACOSX_DEPLOYMENT_TARGET: 13.0
+          MACOSX_DEPLOYMENT_TARGET: 11.0
           CFLAGS: -arch arm64
           CXXFLAGS: -arch arm64
           LDFLAGS: -arch arm64
@@ -40,7 +40,7 @@ jobs:
 
       - name: Build project
         env:
-          MACOSX_DEPLOYMENT_TARGET: 13.0
+          MACOSX_DEPLOYMENT_TARGET: 11.0
           CFLAGS: -arch arm64
           CXXFLAGS: -arch arm64
           LDFLAGS: -arch arm64
